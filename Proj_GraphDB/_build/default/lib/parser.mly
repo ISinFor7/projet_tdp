@@ -81,21 +81,41 @@ primary_expr:
 
 /* TODO: to be completed */
 expr:
-| a = primary_expr { a }
-| e1 = expr; EQ; e2 = expr { BinOp (BCompar BCeq, e1, e2) }
-| e1 = expr; GE; e2 = expr { BinOp (BCompar BCge, e1, e2) }
-| e1 = expr; GT; e2 = expr { BinOp (BCompar BCgt, e1, e2) }
-| e1 = expr; LE; e2 = expr { BinOp (BCompar BCle, e1, e2) }
-| e1 = expr; LT; e2 = expr { BinOp (BCompar BClt, e1, e2) }
-| e1 = expr; NE; e2 = expr { BinOp (BCompar BCne, e1, e2) }
-| e1 = expr; ADD; e2 = expr { BinOp (BArith BAadd, e1, e2) }
-| e1 = expr; SUB; e2 = expr { BinOp (BArith BAsub, e1, e2) }
-| e1 = expr; MUL; e2 = expr { BinOp (BArith BAmul, e1, e2) }
-| e1 = expr; DIV; e2 = expr { BinOp (BArith BAdiv, e1, e2) }
-| e1 = expr; MOD; e2 = expr { BinOp (BArith BAmod, e1, e2) }
-| e1 = expr; BLAND; e2 = expr { BinOp (BLogic BLand, e1, e2) }
-| e1 = expr; BLOR; e2 = expr { BinOp (BLogic BLor, e1, e2) }
+| a = primary_expr {
+     (*Printf.printf "Parsed primary_expr: %s\n" (string_of_expr a);*)
+     a
+     }
+| e1 = expr; op = comp_op; e2 = expr { 
+    (*Printf.printf "Parsed comparison: %s\n" (string_of_expr e1);*)
+    BinOp (BCompar op, e1, e2) 
+  }
+| e1 = expr; op = arith_op; e2 = expr { 
+    (*Printf.printf "Parsed arithmetic: %s\n" (string_of_expr e1);*)
+    BinOp (BArith op, e1, e2) 
+  }
+| e1 = expr; op = blogic; e2 = expr { 
+    (*Printf.printf "Parsed arithmetic: %s\n" (string_of_expr e1);*)
+    BinOp (BLogic op, e1, e2) 
+  }
+  
+comp_op:
+| EQ { BCeq }
+| GE { BCge }
+| GT { BCgt }
+| LE { BCle }
+| LT { BClt }
+| NE { BCne }
 
+blogic:
+| BLAND {BLand}
+| BLOR {BLor}
+
+arith_op:
+| ADD { BAadd }
+| SUB { BAsub }
+| MUL { BAmul }
+| DIV { BAdiv }
+| MOD { BAmod }
 /* Types */
 nodeTpDecl: LPAREN; COLON; i = IDENTIFIER; a = attrib_declList; RPAREN  { DBN (i, a) }
 

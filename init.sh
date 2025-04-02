@@ -11,6 +11,6 @@ opam install ppx_deriving
 opam install ocamlgraph
 dune build
 opam install menhir
-
 opam install utop
+eval $(opam env)
 code .
