@@ -41,11 +41,13 @@ val xv_tpDecl :
   Either.t
 val xv_separated_nonempty_list_COMMA_pattern_ : Lang.pattern list
 val xv_separated_nonempty_list_COMMA_attrib_decl_ : Lang.attrib_decl list
+val xv_separated_nonempty_list_COMMA_attr_pair_ : (string * Lang.expr) list
 val xv_separated_nonempty_list_COMMA_assign_ :
   (string * string * Lang.expr) list
 val xv_separated_nonempty_list_COMMA_IDENTIFIER_ : string list
 val xv_separated_list_COMMA_pattern_ : Lang.pattern list
 val xv_separated_list_COMMA_attrib_decl_ : Lang.attrib_decl list
+val xv_separated_list_COMMA_attr_pair_ : (string * Lang.expr) list
 val xv_separated_list_COMMA_assign_ : (string * string * Lang.expr) list
 val xv_separated_list_COMMA_IDENTIFIER_ : string list
 val xv_relspec : string
@@ -61,6 +63,8 @@ val xv_main : Lang.prog
 val xv_loption_separated_nonempty_list_COMMA_pattern__ : Lang.pattern list
 val xv_loption_separated_nonempty_list_COMMA_attrib_decl__ :
   Lang.attrib_decl list
+val xv_loption_separated_nonempty_list_COMMA_attr_pair__ :
+  (string * Lang.expr) list
 val xv_loption_separated_nonempty_list_COMMA_assign__ :
   (string * string * Lang.expr) list
 val xv_loption_separated_nonempty_list_COMMA_IDENTIFIER__ : string list
@@ -76,6 +80,8 @@ val xv_clause : Lang.clause
 val xv_blogic : Lang.blogic
 val xv_attrib_declList : Lang.attrib_decl list
 val xv_attrib_decl : Lang.attrib_decl
+val xv_attr_pair : string * Lang.expr
+val xv_attr_map : (string * Lang.expr) list
 val xv_assign : string * string * Lang.expr
 val xv_arith_op : Lang.barith
 val menhir_end_marker : int

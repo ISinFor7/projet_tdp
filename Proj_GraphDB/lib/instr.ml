@@ -23,19 +23,31 @@ type norm_prog = NormProg of db_tp * norm_query
   [@@deriving show]
 
 
-let normalize_node_pattern act = function 
-| DeclPattern (v, l) -> (v, [IActOnNode(act, v, l)])
-| VarRefPattern (v) -> (v, [])
+  let normalize_node_pattern act = function 
+  | DeclPattern (v, l, attrs) -> 
+      let base = IActOnNode (act, v, l) in
+      let sets = List.map (fun (f, e) -> ISet(v, f, e)) attrs in
+      (v, base :: sets)
+  | VarRefPattern v -> (v, [])
 
 
 let rec normalize_pattern act = function 
 | SimpPattern p -> normalize_node_pattern act p
-| CompPattern (npt, rl, pt) -> failwith "1 not yet implemented"
+| CompPattern (npt, rl, pt) ->
+  let x_var,x_act = (normalize_node_pattern act npt) in
+  let y_var,y_act = normalize_pattern act pt in
+  let action = IActOnRel (act, x_var, rl, y_var) in
+  (x_var, x_act @ y_act @[action])
 
 let normalize_clause = function
   | Create pats -> 
     List.concat_map (fun  p -> snd (normalize_pattern CreateAct p)) pats
-  | _ -> []
+  | Match pats -> List.concat_map (fun p -> snd (normalize_pattern MatchAct p)) pats
+  | Delete (DeleteNodes vs) -> List.map (fun v -> IDeleteNode v) vs
+  | Delete (DeleteRels rels) -> List.map (fun (v1, lbl, v2) -> IDeleteRel(v1, lbl, v2)) rels
+  | Return vars -> [IReturn vars]
+  | Where e -> [IWhere e]
+  | Set assigns -> List.map (fun (v, f, e) -> ISet(v, f, e)) assigns
 
 let normalize_query (Query cls) = NormQuery (List.concat_map normalize_clause cls)
 

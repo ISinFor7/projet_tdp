@@ -45,7 +45,7 @@ type expr
 
   (* TODO: needs to be extended to deal with attributes *)
 type node_pattern 
-  = DeclPattern of vname * label    (* full node pattern with type declaration *)
+  = DeclPattern of vname * label * (fieldname * expr) list   (* full node pattern with type declaration *)
   | VarRefPattern of vname          (* simple reference to var representing a node *)
   [@@deriving show]
 

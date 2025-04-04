@@ -57,9 +57,19 @@ relspec:
 | SUB; LBRACKET; COLON; rlabel = IDENTIFIER; RBRACKET; ARROW { rlabel }
 | ARROW; LBRACKET; COLON; rlabel = IDENTIFIER; RBRACKET; SUB { rlabel }
 
-npattern: 
-| LPAREN; v = IDENTIFIER; COLON; t = IDENTIFIER; RPAREN { DeclPattern(v, t) }
-| LPAREN; v = IDENTIFIER; RPAREN { VarRefPattern(v) }
+npattern:
+| LPAREN; v = IDENTIFIER; COLON; t = IDENTIFIER; RPAREN
+    { DeclPattern(v, t, []) }
+| LPAREN; v = IDENTIFIER; COLON; t = IDENTIFIER; a = attr_map; RPAREN
+    { DeclPattern(v, t, a) }
+| LPAREN; v = IDENTIFIER; RPAREN
+    { VarRefPattern(v) }
+
+attr_map:
+| LBRACE; fields = separated_list(COMMA, attr_pair); RBRACE { fields }
+
+attr_pair:
+| f = IDENTIFIER; COLON; e = expr { (f, e) }
 
 delete_pattern:
 | LBRACKET; vars = separated_list(COMMA, IDENTIFIER); RBRACKET { DeleteNodes vars }

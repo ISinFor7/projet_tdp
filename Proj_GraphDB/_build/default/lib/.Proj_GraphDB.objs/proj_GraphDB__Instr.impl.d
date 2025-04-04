@@ -1,1 +1,1 @@
-lib/instr.pp.ml: Lang List Ppx_deriving_runtime
+lib/instr.pp.ml: Graphstruct Lang List Ppx_deriving_runtime Printf String
