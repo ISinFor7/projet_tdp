@@ -70,16 +70,18 @@ let label_exist (list_types: vname list) (l: label) : bool = List.mem l list_typ
 let tc_instr (i: instruction) (env: environment) : tc_result = 
   match i with
   | IActOnNode (_act, vn, lb) -> if vname_not_exist (List.map (fun ((n, _)) -> n) env.bindings) vn then
-                                  if label_exist (List.map (fun (DBN(n, _)) -> n) env.types) lb 
-                                    then Result.Ok env 
-                                  else Result.Error ["label doesn't exist."] 
+                                  if label_exist ((fun (DBG (n, _)) ->  (List.map (fun (DBN(h,_)) -> h)) n) env.types) lb 
+                                    then (match _act with
+  |CreateAct -> Result.Ok (add_var vn lb env)
+  |MatchAct -> Result.Ok env )
+                                  else Result.Error ["type doesn't exist."] 
                                 else Result.Error ["name already exist."]
-  | IActOnRel (_act, vn1, lb, vn2) -> Result.Error ["not yet implemented."]
-  | IDeleteNode (vn) -> Result.Error ["not yet implemented."]
-  | IDeleteRel (vn1,vn2,vn3) -> Result.Error ["not yet implemented."]
-  | IReturn (vnl) -> Result.Error ["not yet implemented."]
-  | IWhere (expr) -> Result.Error ["not yet implemented."]
-  | ISet (vn1, vn2, expr)-> Result.Error ["not yet implemented."]
+  | IActOnRel (_act, vn1, lb, vn2) -> Result.Error ["not yet implemented IActOnRel."]
+  | IDeleteNode (vn) -> Result.Error ["not yet implemented IDeleteNode."]
+  | IDeleteRel (vn1,vn2,vn3) -> Result.Error ["not yet implemented IDeleteRel."]
+  | IReturn (vnl) -> Result.Error ["not yet implemented IReturn."]
+  | IWhere (expr) -> Result.Error ["not yet implemented IWhere."]
+  | ISet (vn1, vn2, expr)-> Result.Error ["not yet implemented ISet."]
 
 
 (* type check list of instructions and stop on error *)
