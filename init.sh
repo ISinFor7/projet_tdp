@@ -1,8 +1,6 @@
-opam install
 opam init
 opam install ocaml-lsp-server
 opam install ocamlformat
-tar xfz proj_graphdb.tgz
 cd Proj_GraphDB/
 opam install dune
 opam install ppx_deriving
