@@ -79,7 +79,8 @@ type attrib_decl = fieldname * attrib_tp
   [@@deriving show]
 
 type db_tp = (label, attrib_decl list, label) Graphstruct.db_graph
-[@@deriving show]
+  [@@deriving show]
+
 type prog = Prog of db_tp * query
   [@@deriving show]
 

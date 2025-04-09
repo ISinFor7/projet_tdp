@@ -23,18 +23,27 @@ let remove_var vn env =
 
 (* TODO: add more auxiliary functions here *)
 
+let rec type_exist = function list_types -> function
+  | [] -> true
+  | (x :: xs) -> (List.mem x list_types) && (type_exist list_types xs);;
+
 let rec no_duplicates = function
   | [] -> true
   | (x :: xs) -> not (List.mem x xs) && (no_duplicates xs);;
+
+let types_rel_exist rtdecls ntdecls = 
+  type_exist (List.map (fun (DBN(n, _)) -> n) ntdecls) (List.map (fun (DBR(n, _,_)) -> n) rtdecls) &&
+  type_exist (List.map (fun (DBN(n, _)) -> n) ntdecls) (List.map (fun (DBR(_, _,n)) -> n) rtdecls) 
 
 (* verify that types are unique (no duplicate declaration of a type) *)
 let types_unique ntdecls = 
   no_duplicates (List.map (fun (DBN(n, _)) -> n) ntdecls) 
 
-(* TODO: fill in details *)
 let check_graph_types (DBG (ntdecls, rtdecls)) = 
   if types_unique ntdecls
-  then Result.Ok () 
+  then if types_rel_exist rtdecls ntdecls
+    then Result.Ok () 
+    else Result.Error "rel"
   else Result.Error "duplicates";;
 
 (* TODO: fill in details *)
@@ -48,16 +57,30 @@ let check_expr e et env : tc_result =
   try 
     if tp_expr env e = et
     then Result.Ok env
-    else Result.Error ["Expression does not have expected type " ^ (show_attrib_tp et)]
+    else Result.Error ["Expression does not have expected type " ^ (show_attrib_tp et) ]
   with 
   | TypeError s -> Result.Error [s]
   | FieldAccError s -> Result.Error [s]
   
+let vname_not_exist list_vnames = function
+(v:vname) -> not (List.mem v list_vnames)
+
+let label_exist (list_types: vname list) (l: label) : bool = List.mem l list_types
 
 let tc_instr (i: instruction) (env: environment) : tc_result = 
   match i with
-  | IActOnNode (_act, vn, lb) -> Result.Error ["2 not yet implemented"]
-  | _  -> Result.Error ["also not implemented"]
+  | IActOnNode (_act, vn, lb) -> if vname_not_exist (List.map (fun ((n, _)) -> n) env.bindings) vn then
+                                  if label_exist (List.map (fun (DBN(n, _)) -> n) env.types) lb 
+                                    then Result.Ok env 
+                                  else Result.Error ["label doesn't exist."] 
+                                else Result.Error ["name already exist."]
+  | IActOnRel (_act, vn1, lb, vn2) -> Result.Error ["not yet implemented."]
+  | IDeleteNode (vn) -> Result.Error ["not yet implemented."]
+  | IDeleteRel (vn1,vn2,vn3) -> Result.Error ["not yet implemented."]
+  | IReturn (vnl) -> Result.Error ["not yet implemented."]
+  | IWhere (expr) -> Result.Error ["not yet implemented."]
+  | ISet (vn1, vn2, expr)-> Result.Error ["not yet implemented."]
+
 
 (* type check list of instructions and stop on error *)
 let check_and_stop (res : tc_result) i : tc_result = Result.bind res (tc_instr i)
@@ -68,11 +91,11 @@ let tc_instrs_stop gt instrs : tc_result =
 
   (* TODO: typecheck instructions *)
 let typecheck_instructions continue gt instrs np = 
-  let r = Result.Ok initial_environment in   (* call to real typechecker here *)
+  let r = tc_instrs_stop gt instrs in   (* call to real typechecker here *)
   match r with
   | Result.Error etc -> Printf.printf "%s\n" (String.concat "\n" etc); 
                         failwith "stopped"
-  |_ -> np
+  | Result.Ok env -> np
   
 
   (* Typecheck program; 
